@@ -1,0 +1,140 @@
+<html>
+
+<head>
+  <!--CSS-->
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <!--Bootstrap-->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <!--On run script-->
+  <script>
+    var arrayLength = 5;
+    // Current question
+    var questionIndex;
+    // Index of randomly chosen numbers from 0 to 4
+    var questionOrder;
+    // Consecutive, counts up
+    var numQuestionsAnswered;
+    var numCorrect;
+
+
+    var questions = ["q1", "q2", "q3", "q4", "q5"];
+    var answers = ["a1", "a2", "a3", "a4", "a5"];
+
+    if (document.readyState !== 'loading') {
+      console.log('document is already ready, just execute code here');
+      initialize();
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('document was not ready, place code here');
+        initialize();
+        setQuestion(0);
+      });
+    }
+
+    function initialize() {
+      questionOrder = generateRandomlySortedArray(arrayLength);
+      console.log(questionOrder);
+      numQuestionsAnswered = 0;
+      questionIndex = 0;
+      numCorrect = 0;
+      document.getElementById("results").style.display = "none";
+    }
+
+    function setQuestion() {
+      document.getElementById("question-progress").innerHTML = "Question " + (numQuestionsAnswered + 1) + " of " + arrayLength;
+      document.getElementById("question").innerHTML = questions[questionOrder[questionIndex]];
+      setAnswers();
+      //Current question questionOrder[index]
+    }
+
+    function setAnswers() {
+      var answerChoices = [];
+      answerChoices[0] = getCorrectAnswer();
+      for (var i = 1; i < 4; i++) {
+        answerChoices[i] = "wrong";
+      }
+      var answerIndexes = generateRandomlySortedArray(4);
+      console.log("answerChoices: " + answerChoices);
+      document.getElementById("answer-button-1").innerHTML = answerChoices[answerIndexes[0]]
+      document.getElementById("answer-button-2").innerHTML = answerChoices[answerIndexes[1]]
+      document.getElementById("answer-button-3").innerHTML = answerChoices[answerIndexes[2]]
+      document.getElementById("answer-button-4").innerHTML = answerChoices[answerIndexes[3]]
+    }
+
+    function answer(button) {
+      if (button.innerHTML === getCorrectAnswer()) {
+        numCorrect++;
+      }
+      numQuestionsAnswered++;
+      questionIndex++;
+      if (questionIndex >= 5) {
+        showResults();
+        return;
+      }
+      setQuestion();
+    }
+
+    function showResults() {
+      document.getElementById("trivia-game").style.display = "none";
+      document.getElementById("results").style.display = "block";
+      if (numCorrect === 5) {
+        document.getElementById("reload-button").style.display = "none";
+      }
+      document.getElementById("score-text").innerHTML = "You scored " + numCorrect + " out of " + arrayLength;
+    }
+
+    function getCorrectAnswer() {
+      return answers[questionOrder[questionIndex]];
+    }
+
+    function generateRandomlySortedArray(arrayLength) {
+      for (var array = [], i = 0; i < arrayLength; ++i) array[i] = i;
+      return shuffle(array);
+    }
+
+    function shuffle(array) {
+      var tmp, current, top = array.length;
+      if (top)
+        while (--top) {
+          current = Math.floor(Math.random() * (top + 1));
+          tmp = array[current];
+          array[current] = array[top];
+          array[top] = tmp;
+        }
+      return array;
+    }
+
+  </script>
+</head>
+
+<body>
+  <div>
+    <span id="logo">Trivia</span>
+  </div>
+
+  <div id="trivia-game">
+    <h5 id="question-progress" class="d-flex justify-content-center"></h5>
+    <h3 id="question" class="d-flex justify-content-center">what is the question</h3>
+    <div class="container">
+      <div class="row">
+        <!--Answer boxes-->
+        <button id="answer-button-1" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="answer(this)">Answer #1</button>
+        <button id="answer-button-2" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="answer(this)">Answer #2</button>
+        <div class="w-100"></div>
+        <button id="answer-button-3" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="answer(this)">Answer #3</button>
+        <button id="answer-button-4" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="answer(this)">Answer #4</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="results">
+    <h3 id="score-text" class="d-flex justify-content-center"></h3>
+    <button onClick="location.reload();" id="reload-button" class="d-flex justify-content-center btn btn-primary col-12">Try again!</button>
+  </div>
+
+</body>
+
+</html>
