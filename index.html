@@ -50,8 +50,6 @@
   var arrayLength = 5;
   // Current question
   var questionIndex;
-  // Index of randomly chosen numbers from 0 to 4
-  var questionOrder;
   var questions = ["Who was the first YouTuber to reach 1,000,000 subscribers?", "What is the rarest blood type in humans?", "Who was the first president who was actually born in the United States?", "How hot is the sun (Fahrenheit)?", "Which country has the most lakes within its borders?"];
   var answers = [
     ["FRED", "PewDiePie", "Smosh", "T - Series"],
@@ -62,30 +60,24 @@
   ];
 
   if (document.readyState !== 'loading') {
-    console.log('document is already ready, just execute code here');
     initialize();
   } else {
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('document was not ready, place code here');
       initialize();
     });
   }
 
   function initialize() {
-    questionOrder = generateRandomlySortedArray(arrayLength);
-    console.log(questionOrder);
     questionIndex = getQuestionNumber();
     setQuestion();
     document.getElementById("results").style.display = "none";
     document.getElementById("completion-text").style = "display:none"
-    //      console.log(Cookies.get("question-set-1"));
   }
 
   function setQuestion() {
     document.getElementById("question-progress").innerHTML = "Question " + (getNumQuestionsAnswered() + 1) + " of " + questions.length;
     document.getElementById("question").innerHTML = questions[getQuestionNumber()];
     setAnswers();
-    //Current question questionOrder[index]
   }
 
   function setAnswers() {
@@ -95,7 +87,6 @@
       answerChoices[i] = answers[getQuestionNumber()][i];
     }
     var answerIndexes = generateRandomlySortedArray(4);
-    //      console.log("answerChoices: " + answerChoices);
     document.getElementById("answer-button-1").innerHTML = answerChoices[answerIndexes[0]]
     document.getElementById("answer-button-2").innerHTML = answerChoices[answerIndexes[1]]
     document.getElementById("answer-button-3").innerHTML = answerChoices[answerIndexes[2]]
@@ -111,22 +102,35 @@
     if (getNumQuestionsAnswered() >= 5) {
       showResults();
       return;
+    } else {
+
     }
-    setQuestion();
   }
 
+  function showProgress() {
+    hideGameElements();
+    document.getElementById("score-text").innerHTML = "Please continue to the next station!";
+  }
+
+
   function showResults() {
+    hideGameElements();
+    if (getNumQuestionsCorrect() === 5) {
+      showWinElements();
+    }
+
+    document.getElementById("score-text").innerHTML = "You scored " + getNumQuestionsCorrect() + " out of " + questions.length();
+  }
+
+  function hideGameElements() {
     document.getElementById("trivia-game").style = "display:none";
     document.getElementById("results").style = "display:block";
     document.getElementById("completion-text").style = "display:none!important"
-    if (getNumQuestionsCorrect() === 5) {
+  }
+  
+  function showWinElements() {
       document.getElementById("reload-button").style = "display:none!important";
       document.getElementById("completion-text").style = "display:block"
-      console.log("hide button");
-      Cookies.set("question-set-1", "true");
-    }
-    console.log(Cookies.get("question-set-1"));
-    document.getElementById("score-text").innerHTML = "You scored " + getNumQuestionsCorrect() + " out of " + questions.length();
   }
 
   function getCorrectAnswer() {
