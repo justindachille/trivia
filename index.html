@@ -38,7 +38,7 @@
     <h3 id="score-text" class="d-flex justify-content-center"></h3>
     <h3 id="completion-text" class="d-flex justify-content-center">You got all of them correct! Please see Ms. Alvarado in room 310.</h3>
     <button onClick="location.reload();" id="reload-button" class="d-flex justify-content-center btn btn-primary col-12">Try again!</button>
-    <button onClick="location.reload();" id="clear-button" class="d-flex justify-content-center btn btn-primary col-12">Try again!</button>
+    <button onClick="removeUserCookies(); location.reload();" id="clear-button" class="d-flex justify-content-center btn btn-danger col-12 align-bottom">Clear progress</button>
 
   </div>
 
@@ -48,9 +48,6 @@
 
 <!--On run script-->
 <script>
-  var arrayLength = 5;
-  // Current question
-  var questionIndex;
   var questions = ["Who was the first YouTuber to reach 1,000,000 subscribers?", "What is the rarest blood type in humans?", "Who was the first president who was actually born in the United States?", "How hot is the sun (Fahrenheit)?", "Which country has the most lakes within its borders?"];
   var answers = [
     ["FRED", "PewDiePie", "Smosh", "T - Series"],
@@ -69,10 +66,18 @@
   }
 
   function initialize() {
-    questionIndex = getQuestionNumber();
+    var questionIndex = getQuestionNumber();
     setQuestion();
     document.getElementById("results").style.display = "none";
     document.getElementById("completion-text").style = "display:none"
+    if (isQuestionAnswered(questionIndex)) {
+      showProgress();
+      return;
+    }
+    if (getNumQuestionsAnswered() >= getNumQuestions()) {
+      showResults();
+      return;
+    }
   }
 
   function setQuestion() {
@@ -100,7 +105,7 @@
       button.innerHTML === getCorrectAnswer()
     );
 
-    if (getNumQuestionsAnswered() >= 5) {
+    if (getNumQuestionsAnswered() >= getNumQuestions()) {
       showResults();
       return;
     } else {
@@ -117,11 +122,10 @@
 
   function showResults() {
     hideGameElements();
-    if (getNumQuestionsCorrect() === 5) {
+    if (getNumQuestionsCorrect() === getNumQuestions()) {
       showWinElements();
     }
-    document.getElementById("score-text").innerHTML = "You scored " + getNumQuestionsCorrect() + " out of " + questions.length();
-    
+    document.getElementById("score-text").innerHTML = "You scored " + getNumQuestionsCorrect() + " out of " + questions.length;
   }
 
   function hideGameElements() {
@@ -141,7 +145,7 @@
 
   function getCookieNames() {
     var cookieNames = [];
-    for (var i = 1; i <= 5; i++) {
+    for (var i = 1; i <= getNumQuestions(); i++) {
       cookieNames.push("question-set-" + i.toString());
     }
     return cookieNames;
@@ -150,6 +154,12 @@
   function removeUserCookies() {
     for (cookie of getCookieNames()) {
       Cookies.remove(cookie);
+    }
+  }
+
+  function printCookies() {
+    for (cookie of getCookieNames()) {
+      console.log(cookie + ": " + Cookies.get(cookie));
     }
   }
 
@@ -170,11 +180,15 @@
   function getNumQuestionsCorrect() {
     var counter = 0;
     for (cookie of getCookieNames()) {
-      if (Cookies.get(cookie) === true) {
+      if (Cookies.get(cookie) === "true") {
         counter++;
       }
     }
     return counter;
+  }
+  
+  function isQuestionAnswered(questionIndex) {
+    return Cookies.get(getCookieNames()[questionIndex]) != null;
   }
 
   function getQuestionNumber() {
@@ -189,7 +203,9 @@
     return shuffle(array);
   }
 
-
+  function getNumQuestions() {
+    return questions.length;
+  }
 
   function shuffle(array) {
     var tmp, current, top = array.length;
