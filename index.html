@@ -25,11 +25,11 @@
     <div class="container">
       <div class="row">
         <!--Answer boxes-->
-        <button id="answer-button-1" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="answer(this)">Answer #1</button>
-        <button id="answer-button-2" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="answer(this)">Answer #2</button>
+        <button id="answer-button-1" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="checkAnswer(this)">Answer #1</button>
+        <button id="answer-button-2" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="checkAnswer(this)">Answer #2</button>
         <div class="w-100"></div>
-        <button id="answer-button-3" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="answer(this)">Answer #3</button>
-        <button id="answer-button-4" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="answer(this)">Answer #4</button>
+        <button id="answer-button-3" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="checkAnswer(this)">Answer #3</button>
+        <button id="answer-button-4" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="checkAnswer(this)">Answer #4</button>
       </div>
     </div>
   </div>
@@ -52,9 +52,6 @@
   var questionIndex;
   // Index of randomly chosen numbers from 0 to 4
   var questionOrder;
-  // Consecutive, counts up
-  var numQuestionsAnswered;
-  var numCorrect;
   var questions = ["Who was the first YouTuber to reach 1,000,000 subscribers?", "What is the rarest blood type in humans?", "Who was the first president who was actually born in the United States?", "How hot is the sun (Fahrenheit)?", "Which country has the most lakes within its borders?"];
   var answers = [
     ["FRED", "PewDiePie", "Smosh", "T - Series"],
@@ -71,24 +68,22 @@
     document.addEventListener('DOMContentLoaded', function() {
       console.log('document was not ready, place code here');
       initialize();
-      setQuestion(0);
     });
   }
 
   function initialize() {
     questionOrder = generateRandomlySortedArray(arrayLength);
     console.log(questionOrder);
-    numQuestionsAnswered = 0;
-    questionIndex = 0;
-    numCorrect = 0;
+    questionIndex = getQuestionNumber();
+    setQuestion();
     document.getElementById("results").style.display = "none";
     document.getElementById("completion-text").style = "display:none"
     //      console.log(Cookies.get("question-set-1"));
   }
 
   function setQuestion() {
-    document.getElementById("question-progress").innerHTML = "Question " + (numQuestionsAnswered + 1) + " of " + arrayLength;
-    document.getElementById("question").innerHTML = questions[questionOrder[questionIndex]];
+    document.getElementById("question-progress").innerHTML = "Question " + (getNumQuestionsAnswered() + 1) + " of " + questions.length;
+    document.getElementById("question").innerHTML = questions[getQuestionNumber()];
     setAnswers();
     //Current question questionOrder[index]
   }
@@ -97,7 +92,7 @@
     var answerChoices = [];
     answerChoices[0] = getCorrectAnswer();
     for (var i = 1; i < 4; i++) {
-      answerChoices[i] = answers[questionOrder[questionIndex]][i];
+      answerChoices[i] = answers[getQuestionNumber()][i];
     }
     var answerIndexes = generateRandomlySortedArray(4);
     //      console.log("answerChoices: " + answerChoices);
@@ -107,13 +102,13 @@
     document.getElementById("answer-button-4").innerHTML = answerChoices[answerIndexes[3]]
   }
 
-  function answer(button) {
-    if (button.innerHTML === getCorrectAnswer()) {
-      numCorrect++;
-    }
-    numQuestionsAnswered++;
-    questionIndex++;
-    if (questionIndex >= 5) {
+  function checkAnswer(button) {
+    setCookie(
+      getQuestionNumber(),
+      button.innerHTML === getCorrectAnswer()
+    );
+
+    if (getNumQuestionsAnswered() >= 5) {
       showResults();
       return;
     }
@@ -124,24 +119,71 @@
     document.getElementById("trivia-game").style = "display:none";
     document.getElementById("results").style = "display:block";
     document.getElementById("completion-text").style = "display:none!important"
-    if (numCorrect === 5) {
+    if (getNumQuestionsCorrect() === 5) {
       document.getElementById("reload-button").style = "display:none!important";
       document.getElementById("completion-text").style = "display:block"
       console.log("hide button");
-      //        Cookies.set("question-set-1", "true");
+      Cookies.set("question-set-1", "true");
     }
-    //      console.log(Cookies.get("question-set-1"));
-    document.getElementById("score-text").innerHTML = "You scored " + numCorrect + " out of " + arrayLength;
+    console.log(Cookies.get("question-set-1"));
+    document.getElementById("score-text").innerHTML = "You scored " + getNumQuestionsCorrect() + " out of " + questions.length();
   }
 
   function getCorrectAnswer() {
-    return answers[questionOrder[questionIndex]][0];
+    return answers[getQuestionNumber()][0];
+  }
+
+  function getCookieNames() {
+    var cookieNames = [];
+    for (var i = 1; i <= 5; i++) {
+      cookieNames.push("question-set-" + i.toString());
+    }
+    return cookieNames;
+  }
+
+  function removeUserCookies() {
+    for (cookie of getCookieNames()) {
+      Cookies.remove(cookie);
+    }
+  }
+
+  function setCookie(questionNumber, isCorrect) {
+    Cookies.set(getCookieNames()[questionNumber], isCorrect);
+  }
+
+  function getNumQuestionsAnswered() {
+    var counter = 0;
+    for (cookie of getCookieNames()) {
+      if (Cookies.get(cookie) != null) {
+        counter++;
+      }
+    }
+    return counter;
+  }
+
+  function getNumQuestionsCorrect() {
+    var counter = 0;
+    for (cookie of getCookieNames()) {
+      if (Cookies.get(cookie) === true) {
+        counter++;
+      }
+    }
+    return counter;
+  }
+
+  function getQuestionNumber() {
+    var url_string = window.location.href;
+    var url = new URL(url_string);
+    var q = url.searchParams.get("q");
+    return q;
   }
 
   function generateRandomlySortedArray(arrayLength) {
     for (var array = [], i = 0; i < arrayLength; ++i) array[i] = i;
     return shuffle(array);
   }
+
+
 
   function shuffle(array) {
     var tmp, current, top = array.length;
