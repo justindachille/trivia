@@ -38,6 +38,7 @@
     <h3 id="score-text" class="d-flex justify-content-center"></h3>
     <h3 id="completion-text" class="d-flex justify-content-center">You got all of them correct! Please see Ms. Alvarado in room 310.</h3>
     <button onClick="location.reload();" id="reload-button" class="d-flex justify-content-center btn btn-primary col-12">Try again!</button>
+    <button onClick="location.reload();" id="clear-button" class="d-flex justify-content-center btn btn-primary col-12">Try again!</button>
 
   </div>
 
@@ -103,13 +104,14 @@
       showResults();
       return;
     } else {
-
+      showProgress();
     }
   }
 
   function showProgress() {
     hideGameElements();
     document.getElementById("score-text").innerHTML = "Please continue to the next station!";
+    document.getElementById("reload-button").style = "display:none!important";
   }
 
 
@@ -118,8 +120,8 @@
     if (getNumQuestionsCorrect() === 5) {
       showWinElements();
     }
-
     document.getElementById("score-text").innerHTML = "You scored " + getNumQuestionsCorrect() + " out of " + questions.length();
+    
   }
 
   function hideGameElements() {
@@ -127,10 +129,10 @@
     document.getElementById("results").style = "display:block";
     document.getElementById("completion-text").style = "display:none!important"
   }
-  
+
   function showWinElements() {
-      document.getElementById("reload-button").style = "display:none!important";
-      document.getElementById("completion-text").style = "display:block"
+    document.getElementById("reload-button").style = "display:none!important";
+    document.getElementById("completion-text").style = "display:block"
   }
 
   function getCorrectAnswer() {
