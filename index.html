@@ -18,28 +18,29 @@
   <div>
     <span id="logo">Trivia</span>
   </div>
-
-  <div id="trivia-game">
-    <h5 id="question-progress" class="d-flex justify-content-center"></h5>
-    <h3 id="question" class="d-flex justify-content-center">what is the question</h3>
-    <div class="container">
-      <div class="row">
-        <!--Answer boxes-->
-        <button id="answer-button-1" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="checkAnswer(this)">Answer #1</button>
-        <button id="answer-button-2" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="checkAnswer(this)">Answer #2</button>
-        <div class="w-100"></div>
-        <button id="answer-button-3" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="checkAnswer(this)">Answer #3</button>
-        <button id="answer-button-4" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="checkAnswer(this)">Answer #4</button>
+  <div id="container">
+    <div id="trivia-game">
+      <h5 id="question-progress" class="d-flex justify-content-center"></h5>
+      <h3 id="question" class="d-flex justify-content-center">Incorrect url. Please scan QR code to get to this website.</h3>
+      <div class="container">
+        <div class="row">
+          <!--Answer boxes-->
+          <button id="answer-button-1" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="checkAnswer(this)">Answer #1</button>
+          <button id="answer-button-2" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="checkAnswer(this)">Answer #2</button>
+          <div class="w-100"></div>
+          <button id="answer-button-3" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="checkAnswer(this)">Answer #3</button>
+          <button id="answer-button-4" type="button" class="col-12 col-md-6 btn btn-primary col" onClick="checkAnswer(this)">Answer #4</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div id="results">
-    <h3 id="score-text" class="d-flex justify-content-center"></h3>
-    <h3 id="completion-text" class="d-flex justify-content-center">You got all of them correct! Please see Ms. Alvarado in room 310.</h3>
-    <button onClick="location.reload();" id="reload-button" class="d-flex justify-content-center btn btn-primary col-12">Try again!</button>
-    <button onClick="removeUserCookies(); location.reload();" id="clear-button" class="d-flex justify-content-center btn btn-danger col-12 align-bottom">Clear progress</button>
+    <div id="results">
+      <h3 id="score-text" class="d-flex justify-content-center"></h3>
+      <h3 id="completion-text" class="d-flex justify-content-center">You got all of them correct! Please see Ms. Alvarado in room 310.</h3>
+      <button onClick="location.reload();" id="reload-button" class="d-flex justify-content-center btn btn-primary col-12">Try again!</button>
+      <button onClick="removeUserCookies(); location.reload();" id="clear-button" class="d-flex justify-content-center btn btn-danger col-12 align-bottom">Clear progress</button>
 
+    </div>
   </div>
 
 </body>
@@ -67,6 +68,10 @@
 
   function initialize() {
     var questionIndex = getQuestionNumber();
+    if (questionIndex === null || questionIndex < 0 || questionIndex >= getNumQuestions()) {
+      document.getElementById("container").style = "display:none!important";
+      return;
+    }
     setQuestion();
     document.getElementById("results").style.display = "none";
     document.getElementById("completion-text").style = "display:none"
@@ -186,7 +191,7 @@
     }
     return counter;
   }
-  
+
   function isQuestionAnswered(questionIndex) {
     return Cookies.get(getCookieNames()[questionIndex]) != null;
   }
