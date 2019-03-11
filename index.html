@@ -18,6 +18,9 @@
   <div>
     <span id="logo">Trivia</span>
   </div>
+  
+  <h2 id="correct-text" style="text-align:center"></h2>
+  
   <div id="container">
     <div id="trivia-game">
       <h5 id="question-progress" class="d-flex justify-content-center"></h5>
@@ -37,35 +40,30 @@
     <div id="results">
       <h3 id="score-text" class="d-flex justify-content-center"></h3>
       <h3 id="completion-text" class="d-flex justify-content-center">You got all of them correct! Please see Ms. Alvarado in room 310.</h3>
-      <button onClick="location.reload();" id="reload-button" class="d-flex justify-content-center btn btn-primary col-12">Try again!</button>
+      <button onClick="removeUserCookies();" id="reload-button" class="d-flex justify-content-center btn btn-primary col-12">Restart!</button>
       <button onClick="removeUserCookies(); location.reload();" id="clear-button" class="d-flex justify-content-center btn btn-danger col-12 align-bottom">Clear progress</button>
 
     </div>
-  </div>
 
-  <h4 class="d-flex justicy-content-center" style="display:flex;">
+    <br>
+    <br>
+    <p><b><h4 style="text-align:center;">You’re invited!</h4></b><br>to <b>The LA Live: Trivia Bee, hosted by SCL and FBLA</b> Thursday night, March 21st in the Eagle Theater! Come test your knowledge and trivia skills by <b>representing your club/team!</b><br> Compete against other clubs, sports teams, and community members! Featuring special emcee Mr. Messner!<br>
+      <br> To sign up as a team to represent your club or team,
+      <a href="tinyurl.com/TriviaBeeTeamSignUp2019">click here to complete the form</a> or go to <a href="tinyurl.com/TriviaBeeTeamSignUp2019">tinyurl.com/TriviaBeeTeamSignUp2019</a>. Teams should be no more than 4 people*; cost per team is $10<br>
+      <br> All proceeds for this event go to SCL to support wellness and diversity activities on LAHS campus and to LAHS Future Business Leaders of America.<br>
+      <br>
+      <br> *3 competitors plus one alternate
 
-    You’re invited! <br> </h4>
-  <p class="d-flex justicy-content-center">
-    to The LA Live: Trivia Bee, hosted by SCL and FBLA Thursday night, March 21st in the Eagle Theater! <br> Come test your knowledge and trivia skills by representing your club/team! <br> Compete against other clubs, sports teams, and community members! Featuring special emcee Mr. Messner! </p>
-
-  <p class="d-flex justicy-content-center">To sign up as a team to represent your club or team, click <a href="tinyurl.com/TriviaBeeTeamSignUp2019">here</a> to complete the form or go to <a href="tinyurl.com/TriviaBeeTeamSignUp2019">tinyurl.com/TriviaBeeTeamSignUp2019</a>. Teams should be no more than 4 people*; cost per team is $10
-  </p>
-  <p class="d-flex justicy-content-center">
-    All proceeds for this event go to SCL to support wellness and diversity activities on LAHS campus and to LAHS Future Business Leaders of America.
-  </p>
-  <p class="d-flex justicy-content-center">
-    *3 competitors plus one alternate
-
-  </p>
+    </p>
 
 </body>
 
 </html>
 
-<!--On run script-->
+  <!--On run script-->
 <script>
   var questions = ["Who was the first YouTuber to reach 1,000,000 subscribers?", "What is the rarest blood type in humans?", "Who was the first president who was actually born in the United States?", "How hot is the sun (Fahrenheit)?", "Which country has the most lakes within its borders?"];
+  
   var answers = [
     ["FRED", "PewDiePie", "Smosh", "T - Series"],
     ["AB Negative", "O type", "AB positive", "A positive"],
@@ -73,7 +71,7 @@
     ["9941", "99941", "1,000,000", "500"],
     ["Canada", "Finland", "Sweden", "Japan"]
   ];
-
+  
   if (document.readyState !== 'loading') {
     initialize();
   } else {
@@ -81,7 +79,7 @@
       initialize();
     });
   }
-
+  
   function initialize() {
     var questionIndex = getQuestionNumber();
     if (questionIndex === null || questionIndex < 0 || questionIndex >= getNumQuestions()) {
@@ -100,13 +98,13 @@
       return;
     }
   }
-
+  
   function setQuestion() {
     document.getElementById("question-progress").innerHTML = "Question " + (getNumQuestionsAnswered() + 1) + " of " + questions.length;
     document.getElementById("question").innerHTML = questions[getQuestionNumber()];
     setAnswers();
   }
-
+  
   function setAnswers() {
     var answerChoices = [];
     answerChoices[0] = getCorrectAnswer();
@@ -119,13 +117,19 @@
     document.getElementById("answer-button-3").innerHTML = answerChoices[answerIndexes[2]]
     document.getElementById("answer-button-4").innerHTML = answerChoices[answerIndexes[3]]
   }
-
+  
   function checkAnswer(button) {
+    var correct = button.innerHTML === getCorrectAnswer();
+    if (correct) {
+      document.getElementById("correct-text").innerHTML = "Correct!";      
+    } else {
+      document.getElementById("correct-text").innerHTML = "Wrong";
+    }
+
     setCookie(
       getQuestionNumber(),
-      button.innerHTML === getCorrectAnswer()
+      correct
     );
-
     if (getNumQuestionsAnswered() >= getNumQuestions()) {
       showResults();
       return;
@@ -133,14 +137,13 @@
       showProgress();
     }
   }
-
+  
   function showProgress() {
     hideGameElements();
     document.getElementById("score-text").innerHTML = "Please continue to the next station!";
     document.getElementById("reload-button").style = "display:none!important";
   }
-
-
+  
   function showResults() {
     hideGameElements();
     if (getNumQuestionsCorrect() === getNumQuestions()) {
@@ -148,22 +151,22 @@
     }
     document.getElementById("score-text").innerHTML = "You scored " + getNumQuestionsCorrect() + " out of " + questions.length;
   }
-
+  
   function hideGameElements() {
     document.getElementById("trivia-game").style = "display:none";
     document.getElementById("results").style = "display:block";
     document.getElementById("completion-text").style = "display:none!important"
   }
-
+  
   function showWinElements() {
     document.getElementById("reload-button").style = "display:none!important";
     document.getElementById("completion-text").style = "display:block"
   }
-
+  
   function getCorrectAnswer() {
     return answers[getQuestionNumber()][0];
   }
-
+  
   function getCookieNames() {
     var cookieNames = [];
     for (var i = 1; i <= getNumQuestions(); i++) {
@@ -171,23 +174,22 @@
     }
     return cookieNames;
   }
-
+  
   function removeUserCookies() {
     for (cookie of getCookieNames()) {
       Cookies.remove(cookie);
     }
   }
-
+  
   function printCookies() {
     for (cookie of getCookieNames()) {
       console.log(cookie + ": " + Cookies.get(cookie));
     }
   }
-
+  
   function setCookie(questionNumber, isCorrect) {
     Cookies.set(getCookieNames()[questionNumber], isCorrect);
   }
-
   function getNumQuestionsAnswered() {
     var counter = 0;
     for (cookie of getCookieNames()) {
@@ -197,7 +199,7 @@
     }
     return counter;
   }
-
+  
   function getNumQuestionsCorrect() {
     var counter = 0;
     for (cookie of getCookieNames()) {
@@ -207,27 +209,27 @@
     }
     return counter;
   }
-
+  
   function isQuestionAnswered(questionIndex) {
     return Cookies.get(getCookieNames()[questionIndex]) != null;
   }
-
+  
   function getQuestionNumber() {
     var url_string = window.location.href;
     var url = new URL(url_string);
     var q = url.searchParams.get("q");
     return q;
   }
-
+  
   function generateRandomlySortedArray(arrayLength) {
     for (var array = [], i = 0; i < arrayLength; ++i) array[i] = i;
     return shuffle(array);
   }
-
+  
   function getNumQuestions() {
     return questions.length;
   }
-
+  
   function shuffle(array) {
     var tmp, current, top = array.length;
     if (top)
@@ -239,5 +241,4 @@
       }
     return array;
   }
-
 </script>
